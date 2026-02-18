@@ -12,8 +12,8 @@ export class ItemService {
   private readonly apiUrl = "http://localhost:8080/api/v1/items";
 
   private selectedItemSubject = new BehaviorSubject<Item | null>(null);
-
-  //for components listening to selectedItem
+  
+  //for components listening to selectedItem 
   selectedItem$ = this.selectedItemSubject.asObservable();
 
   //for components updating the selectedItem
