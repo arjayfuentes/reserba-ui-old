@@ -1,0 +1,80 @@
+<div class="container">
+  <div class="category-sum">
+    <p>
+      Sum Amount: {{ sum }}
+      <select
+        [(ngModel)]="selectedCategory"
+        (ngModelChange)="onGetSumPerCategory()"
+      >
+        <option value="" disabled selected>--- Choose Category ---</option>
+        <option *ngFor="let category of categories" [value]="category">
+          {{ category }}
+        </option>
+      </select>
+    </p>
+  </div>
+  <p>SELECTED: {{ selectedCategory }}</p>
+  <div class="container">
+    <ul>
+      <li *ngFor="let entry of categorySum | keyvalue">
+        <strong>{{ entry.key }} : </strong> {{ entry.value | currency: "EUR" }}
+      </li>
+    </ul>
+  </div>
+
+  <p>FILTER by name</p>
+  <input
+    type="text"
+    [(ngModel)]="filteredByName"
+    (ngModelChange)="filterChangeName()"
+  />
+
+  <p>FILTER by category</p>
+  <p>{{ selectedCategories | json }}</p>
+  <div class="checkbox-group">
+    <p *ngFor="let category of categories">
+      <input
+        type="checkbox"
+        [ngModel]="selectedCategories.includes(category)"
+        (ngModelChange)="onToggleCategory(category, $event)"
+      />
+      {{ category }}
+    </p>
+  </div>
+
+  <div *ngIf="!isLoading; else content">
+    <table>
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Description</th>
+          <th>Price</th>
+          <th>Action</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let item of filteredItems">
+          <td>{{ item.name }}</td>
+          <td>{{ item.description }}</td>
+          <td>{{ item.price | currency: "EUR" }}</td>
+          <td>
+            <button type="edit" (click)="onEdit(item)">Edit</button>
+            <button type="button" (click)="onSelectItem(item)">Select</button>
+            <button type="button" (click)="onDelete(item.id)">Delete</button>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+  <ng-template #content>
+    <label>Item is Loading</label>
+  </ng-template>
+</div>
+
+<div class="container-form">
+  <app-item-form
+    [itemToEdit]="selectedItem"
+    (itemAddedChange)="handleAddedItem($event)"
+    (itemEditChange)="handleUpdatedItem($event)"
+  ></app-item-form>
+</div>

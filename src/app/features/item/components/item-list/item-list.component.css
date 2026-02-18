@@ -1,0 +1,34 @@
+.container-form {
+    margin-top: 20px;
+}
+
+.checkbox-group {
+  display: flex;       /* Aligns items in a row */
+  flex-wrap: wrap;    /* Moves items to next line if they don't fit */
+  gap: 15px;          /* Adds space between the checkboxes */
+  align-items: center; /* Centers items vertically */
+  margin-bottom: 50px;
+}
+
+.checkbox-group p {
+  margin: 0;          /* Removes the default paragraph spacing */
+  display: flex;
+  align-items: center;
+  gap: 5px;           /* Space between checkbox and text */
+}
+
+/* Add this to your item-list.component.css */
+.category-sum {
+  position: fixed;      /* Pin it to the screen */
+  top: 20px;           /* 20px from the top */
+  right: 20px;         /* 20px from the right */
+  z-index: 1000;       /* Keep it on top of the table */
+  
+  /* Nice styling for a "floating card" look */
+  background-color: white;
+  padding: 15px;
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  border: 1px solid #ddd;
+  min-width: 200px;
+}

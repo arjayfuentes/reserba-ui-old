@@ -1,0 +1,8 @@
+.main-view {
+    display: flex;
+}
+
+
+.item-view {
+    padding: 20px;
+}

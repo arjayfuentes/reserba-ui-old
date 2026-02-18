@@ -1,0 +1,25 @@
+.error-message{
+    color: #d93025; /* A clear, readable red */
+    font-size: 12px;
+    margin-top: 4px;
+    font-weight: 500;
+    display: block; /* Ensures it starts on a new line */
+}
+
+.form-group{
+    margin-top: 10px;
+    margin-bottom: 10px;
+}
+
+
+.light-mode {
+  background-color: #ffffff;
+  color: #000000;
+  border: 1px solid #ddd;
+}
+
+.dark-mode {
+  background-color: #1a1a1a;
+  color: #ffffff;
+  border: 1px solid #444;
+}
