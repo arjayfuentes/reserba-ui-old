@@ -1,8 +1,9 @@
-import { Component, EventEmitter, inject, Input, OnChanges, Output, SimpleChanges } from '@angular/core';
+import { Component, EventEmitter, inject, Input, OnChanges, OnDestroy, Output, SimpleChanges } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { ItemService } from '../../services/item.service';
 import { Item } from '../../models/item.model';
 import { CommonModule } from '@angular/common';
+import { Subject, takeUntil } from 'rxjs';
 
 @Component({
   selector: 'app-item-form',
@@ -10,10 +11,11 @@ import { CommonModule } from '@angular/common';
   templateUrl: './item-form.component.html',
   styleUrl: './item-form.component.css'
 })
-export class ItemFormComponent implements OnChanges {
+export class ItemFormComponent implements OnChanges, OnDestroy {
 
   private fb = inject(FormBuilder);
   private itemService = inject(ItemService);
+  private destroy$ = new Subject<void>();
   
   activeTheme: 'light' | 'dark' = 'light';
   get themeStyles() {
@@ -46,30 +48,39 @@ export class ItemFormComponent implements OnChanges {
     }
   }
 
+  ngOnDestroy(): void { 
+    this.destroy$.next(); 
+    this.destroy$.complete(); 
+  }
+
   onSubmit() {
     if(this.itemForm.valid) {
       const item: Item = this.itemForm.getRawValue();
 
       if(item.id) {
-        this.itemService.updateItem(item.id, item).subscribe({
-          next: (data)=> {
-            this.itemEditChange.emit(data);
-            this.itemForm.reset();
-          },
-          error: (err) => {
-            console.log(err);
-          }
-        })
+        this.itemService.updateItem(item.id, item)
+          .pipe(takeUntil(this.destroy$))
+          .subscribe({
+            next: (data)=> {
+              this.itemEditChange.emit(data);
+              this.itemForm.reset();
+            },
+            error: (err) => {
+              console.log(err);
+            }
+          });
       } else {
-        this.itemService.saveItem(item).subscribe({
-          next: (data) => {
-            this.itemAddedChange.emit(data);
-            this.itemForm.reset();
-          },
-          error: (err) => {
-            console.log(err);
-          }
-        });
+        this.itemService.saveItem(item)
+          .pipe(takeUntil(this.destroy$))
+          .subscribe({
+            next: (data) => {
+              this.itemAddedChange.emit(data);
+              this.itemForm.reset();
+            },
+            error: (err) => {
+              console.log(err);
+            }
+          });
       }
       
     }

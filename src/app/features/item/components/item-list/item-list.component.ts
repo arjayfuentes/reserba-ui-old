@@ -1,8 +1,8 @@
-import { Component, inject, OnInit } from '@angular/core';
+import { Component, inject, OnDestroy, OnInit } from '@angular/core';
 import { Item } from '../../models/item.model';
 import { CommonModule, KeyValuePipe } from '@angular/common';
 import { ItemService } from '../../services/item.service';
-import { tap } from 'rxjs';
+import { Subject, takeUntil, tap } from 'rxjs';
 import { ItemFormComponent } from "../item-form/item-form.component";
 import { FormsModule } from '@angular/forms';
 
@@ -12,10 +12,11 @@ import { FormsModule } from '@angular/forms';
   templateUrl: './item-list.component.html',
   styleUrl: './item-list.component.css'
 })
-export class ItemListComponent implements OnInit{
+export class ItemListComponent implements OnInit, OnDestroy{
 
   private itemService = inject(ItemService);
-
+  private destroy$ = new Subject<void>();
+  
   categories: string[] = [];
   categorySum: Record<string, number> = {};
   errorMessage: string | null = null;
@@ -27,6 +28,7 @@ export class ItemListComponent implements OnInit{
   selectedCategory: string = '';
   selectedCategories: string[] = [];
   sum: number = 0;
+  
 
   ngOnInit(): void {
     this.getCategories();
@@ -34,13 +36,20 @@ export class ItemListComponent implements OnInit{
     this.getSumPriceOfCategories();
   }
 
+  ngOnDestroy(): void { 
+    this.destroy$.next(); 
+    this.destroy$.complete(); 
+  }
+
   private getCategories() {
-     this.itemService.getCategories().subscribe({
-      next: (data) => {
-        this.categories = data;
-      },
-      error: (err) => console.log()
-    })
+     this.itemService.getCategories()
+      .pipe(takeUntil(this.destroy$))
+      .subscribe({
+        next: (data) => {
+          this.categories = data;
+        },
+        error: (err) => console.log()
+      });
   }
 
   private getItems() {
@@ -63,14 +72,16 @@ export class ItemListComponent implements OnInit{
   }
 
   private getSumPriceOfCategories() {
-    this.itemService.getSumPriceOfCategories().subscribe({
-      next:(data) => {
-        this.categorySum = data;
-      },
-      error: (err) => {
-        console.log(err);
-      }
-    })
+    this.itemService.getSumPriceOfCategories()
+      .pipe(takeUntil(this.destroy$))
+      .subscribe({
+        next:(data) => {
+          this.categorySum = data;
+        },
+        error: (err) => {
+          console.log(err);
+        }
+      });
   }
 
   filterChangeName() {
@@ -97,9 +108,8 @@ export class ItemListComponent implements OnInit{
   onDelete(id: string | undefined) {
     this.itemService.deleteItem(id)
         .pipe(
-          tap(
-            res=> console.log(res)
-          )
+          tap(res=> console.log(res)),
+          takeUntil(this.destroy$)
         ).subscribe(() => {
           this.items = this.items.filter(item => item.id != id);
         });
@@ -110,14 +120,18 @@ export class ItemListComponent implements OnInit{
   }
 
   onGetSumPerCategory() {
-    this.itemService.getSumPriceOfCategory(this.selectedCategory).subscribe({
-      next:(data) => {
-        this.sum = data;
-      },
-      error: (err) => {
-        console.log(err);
-      }
-    })
+    this.itemService.getSumPriceOfCategory(this.selectedCategory)
+      .pipe(
+        takeUntil(this.destroy$)
+      )
+      .subscribe({
+        next:(data) => {
+          this.sum = data;
+        },
+        error: (err) => {
+          console.log(err);
+        }
+      });
   }
 
   onSelectItem(item: Item) {
@@ -142,15 +156,17 @@ export class ItemListComponent implements OnInit{
     if (newList.length === 0) {
       this.getItems();
     } else {
-      this.itemService.filterItemsByCategories(newList).subscribe({
-        next: (data) => {
-          this.items = data;
-          this.filteredItems = data;
-        },
-        error: (err) => {
-          console.log('Failed to filter items');
-        }
-      });
+      this.itemService.filterItemsByCategories(newList)
+        .pipe(takeUntil(this.destroy$))
+        .subscribe({
+          next: (data) => {
+            this.items = data;
+            this.filteredItems = data;
+          },
+          error: (err) => {
+            console.log('Failed to filter items');
+          }
+        });
     }
   }
   
