@@ -31,7 +31,6 @@ export class ItemFormComponent implements OnChanges, OnInit, OnDestroy {
   @Input() itemToEdit: Item | null = null;
   @Output() itemAddedChange = new EventEmitter<Item>();
   @Output() itemEditChange = new EventEmitter<Item>();
-  @ViewChild('nameInput') inputElement!: ElementRef<HTMLInputElement>;
 
   categories = ['Electronics', 'Books', 'Clothing', 'Home'];
   itemForm = this.fb.nonNullable.group({
@@ -42,7 +41,6 @@ export class ItemFormComponent implements OnChanges, OnInit, OnDestroy {
     imageUrl: ['', [Validators.required]],
     category: ['Electronic']
   });
-
     // No FormBuilder needed here
     // itemForm = new FormGroup({
     //   id: new FormControl(''),
@@ -51,6 +49,10 @@ export class ItemFormComponent implements OnChanges, OnInit, OnDestroy {
     //   price: new FormControl(0, [Validators.required]),
     //   imageUrl: new FormControl('', [Validators.required])
     // });
+      
+   //@ViewChild, the element is not available in ngOnInit. You must use ngAfterViewInit.
+   @ViewChild('nameInput') inputElement!: ElementRef<HTMLInputElement>;
+
 
   ngOnChanges(changes: SimpleChanges): void {
     if(changes['itemToEdit']) {
