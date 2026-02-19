@@ -1,4 +1,4 @@
-import { Component, EventEmitter, inject, Input, OnChanges, OnDestroy, OnInit, Output, SimpleChanges } from '@angular/core';
+import { Component, EventEmitter, inject, Input, OnChanges, OnDestroy, OnInit, Output, SimpleChanges, ViewChild, ElementRef } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { ItemService } from '../../services/item.service';
 import { Item } from '../../models/item.model';
@@ -31,6 +31,7 @@ export class ItemFormComponent implements OnChanges, OnInit, OnDestroy {
   @Input() itemToEdit: Item | null = null;
   @Output() itemAddedChange = new EventEmitter<Item>();
   @Output() itemEditChange = new EventEmitter<Item>();
+  @ViewChild('nameInput') inputElement!: ElementRef<HTMLInputElement>;
 
   categories = ['Electronics', 'Books', 'Clothing', 'Home'];
   itemForm = this.fb.nonNullable.group({
@@ -110,6 +111,11 @@ export class ItemFormComponent implements OnChanges, OnInit, OnDestroy {
       }
       
     }
+  }
+
+  focusInput() {
+    // Access the native DOM element
+    this.inputElement.nativeElement.focus();
   }
 
   toggleTheme() {
