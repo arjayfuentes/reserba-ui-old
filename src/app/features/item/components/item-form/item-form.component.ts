@@ -3,7 +3,7 @@ import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { ItemService } from '../../services/item.service';
 import { Item } from '../../models/item.model';
 import { CommonModule } from '@angular/common';
-import { debounceTime, Subject, takeUntil } from 'rxjs';
+import { debounceTime, Subject, switchMap, takeUntil } from 'rxjs';
 
 @Component({
   selector: 'app-item-form',
@@ -62,8 +62,13 @@ export class ItemFormComponent implements OnChanges, OnInit, OnDestroy {
 
   ngOnInit(): void {
     this.itemForm.get('name')?.valueChanges.pipe(
-      debounceTime(400),
+      debounceTime(400), // Wait for the user to stop typing
       takeUntil(this.destroy$)
+      // distinctUntilChanged(),   // Only search if the text actually changed
+      // switchMap(searchTerm => {
+      //   console.log('Starting new search for:', searchTerm);
+      //   return this.itemService.getCategories()); // The inner observable
+      // }),
     ).subscribe( data=> {
       console.log('name change');
     })
