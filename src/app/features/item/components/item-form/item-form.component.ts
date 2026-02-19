@@ -32,13 +32,24 @@ export class ItemFormComponent implements OnChanges, OnInit, OnDestroy {
   @Output() itemAddedChange = new EventEmitter<Item>();
   @Output() itemEditChange = new EventEmitter<Item>();
 
+  categories = ['Electronics', 'Books', 'Clothing', 'Home'];
   itemForm = this.fb.nonNullable.group({
     id: [''],
     name: ['', [Validators.required, Validators.minLength(5)]],
     description: ['', [Validators.required]],
     price:[0, [Validators.required]],
-    imageUrl: ['', [Validators.required]]
+    imageUrl: ['', [Validators.required]],
+    category: ['Electronic']
   });
+
+    // No FormBuilder needed here
+    // itemForm = new FormGroup({
+    //   id: new FormControl(''),
+    //   name: new FormControl('', [Validators.required, Validators.minLength(5)]),
+    //   description: new FormControl('', [Validators.required]),
+    //   price: new FormControl(0, [Validators.required]),
+    //   imageUrl: new FormControl('', [Validators.required])
+    // });
 
   ngOnChanges(changes: SimpleChanges): void {
     if(changes['itemToEdit']) {
@@ -54,7 +65,7 @@ export class ItemFormComponent implements OnChanges, OnInit, OnDestroy {
       debounceTime(400),
       takeUntil(this.destroy$)
     ).subscribe( data=> {
-      alert('name change');
+      console.log('name change');
     })
   }
 

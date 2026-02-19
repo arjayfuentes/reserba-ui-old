@@ -2,7 +2,7 @@ import { Component, inject, OnDestroy, OnInit } from '@angular/core';
 import { Item } from '../../models/item.model';
 import { CommonModule, KeyValuePipe } from '@angular/common';
 import { ItemService } from '../../services/item.service';
-import { Subject, takeUntil, tap } from 'rxjs';
+import { map, Subject, takeUntil, tap } from 'rxjs';
 import { ItemFormComponent } from "../item-form/item-form.component";
 import { FormsModule } from '@angular/forms';
 
@@ -18,6 +18,8 @@ export class ItemListComponent implements OnInit, OnDestroy{
   private destroy$ = new Subject<void>();
   
   categories: string[] = [];
+  modifiedCategoriesWithCat: string[] = [];
+
   categorySum: Record<string, number> = {};
   errorMessage: string | null = null;
   filteredByName: string = '';
@@ -43,10 +45,19 @@ export class ItemListComponent implements OnInit, OnDestroy{
 
   private getCategories() {
      this.itemService.getCategories()
-      .pipe(takeUntil(this.destroy$))
+      .pipe(
+        takeUntil(this.destroy$),
+       // 1. First transformation: Add "-cat"
+        map(data => data.map(cat => `${cat}-cat`)),
+        tap(catVersion => this.modifiedCategoriesWithCat = catVersion),
+
+        // 2. Second transformation: Remove "-cat" to go back to original
+        map(data => data.map(cat => cat.replace('-cat', ''))),
+        tap(backToOriginal => console.log('Back to Original:', backToOriginal))
+      )
       .subscribe({
-        next: (data) => {
-          this.categories = data;
+        next: (transformedData) => {
+          this.categories = transformedData;
         },
         error: (err) => console.log()
       });

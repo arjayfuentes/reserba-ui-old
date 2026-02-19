@@ -56,7 +56,10 @@
         <tr *ngFor="let item of filteredItems">
           <td>{{ item.name }}</td>
           <td>{{ item.description }}</td>
-          <td>{{ item.price | currency: "EUR" }}</td>
+          <td>
+            {{ item.price | currency: "EUR" }}
+            <p>Decimal {{ item.price | number: "1.2-2" }}</p>
+          </td>
           <td>
             <button type="edit" (click)="onEdit(item)">Edit</button>
             <button type="button" (click)="onSelectItem(item)">Select</button>
