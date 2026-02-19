@@ -1,9 +1,9 @@
-import { Component, EventEmitter, inject, Input, OnChanges, OnDestroy, Output, SimpleChanges } from '@angular/core';
+import { Component, EventEmitter, inject, Input, OnChanges, OnDestroy, OnInit, Output, SimpleChanges } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { ItemService } from '../../services/item.service';
 import { Item } from '../../models/item.model';
 import { CommonModule } from '@angular/common';
-import { Subject, takeUntil } from 'rxjs';
+import { debounceTime, Subject, takeUntil } from 'rxjs';
 
 @Component({
   selector: 'app-item-form',
@@ -11,7 +11,8 @@ import { Subject, takeUntil } from 'rxjs';
   templateUrl: './item-form.component.html',
   styleUrl: './item-form.component.css'
 })
-export class ItemFormComponent implements OnChanges, OnDestroy {
+export class ItemFormComponent implements OnChanges, OnInit, OnDestroy {
+   
 
   private fb = inject(FormBuilder);
   private itemService = inject(ItemService);
@@ -46,6 +47,15 @@ export class ItemFormComponent implements OnChanges, OnDestroy {
         this.itemForm.patchValue(item);
       }
     }
+  }
+
+  ngOnInit(): void {
+    this.itemForm.get('name')?.valueChanges.pipe(
+      debounceTime(400),
+      takeUntil(this.destroy$)
+    ).subscribe( data=> {
+      alert('name change');
+    })
   }
 
   ngOnDestroy(): void { 

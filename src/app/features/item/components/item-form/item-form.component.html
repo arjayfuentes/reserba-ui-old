@@ -3,6 +3,29 @@
   Theme: <strong>{{ activeTheme }}</strong>
   <button (click)="toggleTheme()">Toggle Dark Mode</button>
 </p>
+<div>
+  <label>
+    <input
+      type="radio"
+      name="themeGroup"
+      value="light"
+      [checked]="activeTheme === 'light'"
+      (change)="activeTheme = 'light'"
+    />
+    Light
+  </label>
+
+  <label>
+    <input
+      type="radio"
+      name="themeGroup"
+      value="dark"
+      [checked]="activeTheme === 'dark'"
+      (change)="activeTheme = 'dark'"
+    />
+    Dark
+  </label>
+</div>
 <p [ngStyle]="themeStyles">NG STYLE</p>
 <p [ngClass]="themeClass">NG CLASS</p>
 <form [formGroup]="itemForm" (ngSubmit)="onSubmit()">
